@@ -13,6 +13,11 @@ const client = new Client();
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files (HTML, CSS, JS)
 
+// Route for serving the index.html file
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Event listener for QR code generation (to authenticate WhatsApp Web)
 client.on('qr', (qr) => {
     qrcode.generate(qr, { small: true });
