@@ -81,6 +81,13 @@
             font-size: 1rem;
             color: #007700;
         }
+
+        /* Added a message style for error responses */
+        .error {
+            color: red;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +99,7 @@
             <input type="text" id="name" name="name" required placeholder="Enter your name">
 
             <label for="whatsapp">WhatsApp Number:</label>
-            <input type="text" id="whatsapp" name="whatsapp" required placeholder="Enter your WhatsApp number">
+            <input type="text" id="whatsapp" name="whatsapp" required placeholder="Enter your WhatsApp number" pattern="\d{10}" title="Please enter a valid 10-digit phone number">
 
             <label for="medicine">Medicine Name:</label>
             <input type="text" id="medicine" name="medicine" required placeholder="Enter the medicine name">
@@ -118,6 +125,14 @@
                     medicine: document.getElementById('medicine').value,
                     expiry: document.getElementById('expiry').value,
                 };
+
+                // Client-side validation for WhatsApp number (optional but recommended)
+                const whatsappPattern = /^\d{10}$/;
+                if (!whatsappPattern.test(formData.whatsapp)) {
+                    responseDiv.textContent = 'Please enter a valid 10-digit WhatsApp number.';
+                    responseDiv.classList.add('error');
+                    return;
+                }
 
                 try {
                     const response = await fetch('/api/medicine', {
