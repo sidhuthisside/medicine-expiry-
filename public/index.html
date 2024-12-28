@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REMEDIFY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(120deg, #4facfe, #00f2fe);
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            color: #007acc;
+        }
+
+        p {
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input {
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.8rem;
+            background: #007acc;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #005999;
+        }
+
+        .response {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #007700;
+        }
+
+        /* Added a message style for error responses */
+        .error {
+            color: red;
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Remedify</h1>
+        <p>Keep track of your medicine expiry dates effortlessly.</p>
+        <form id="medicineForm">
+            <label for="name">Your Name:</label>
+            <input type="text" id="name" name="name" required placeholder="Enter your name">
+
+            <label for="whatsapp">WhatsApp Number:</label>
+            <input type="text" id="whatsapp" name="whatsapp" required placeholder="Enter your WhatsApp number" pattern="\d{10}" title="Please enter a valid 10-digit phone number">
+
+            <label for="medicine">Medicine Name:</label>
+            <input type="text" id="medicine" name="medicine" required placeholder="Enter the medicine name">
+
+            <label for="expiry">Expiry Date:</label>
+            <input type="date" id="expiry" name="expiry" required>
+
+            <button type="submit">Set Reminder</button>
+        </form>
+        <div id="response" class="response"></div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('medicineForm');
+            const responseDiv = document.getElementById('response');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const formData = {
+                    name: document.getElementById('name').value,
+                    whatsapp: document.getElementById('whatsapp').value,
+                    medicine: document.getElementById('medicine').value,
+                    expiry: document.getElementById('expiry').value,
+                };
+
+                // Client-side validation for WhatsApp number (optional but recommended)
+                const whatsappPattern = /^\d{10}$/;
+                if (!whatsappPattern.test(formData.whatsapp)) {
+                    responseDiv.textContent = 'Please enter a valid 10-digit WhatsApp number.';
+                    responseDiv.classList.add('error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/medicine', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+                    responseDiv.textContent = data.message;
+                    responseDiv.style.color = data.error ? 'red' : 'green';
+                } catch (error) {
+                    responseDiv.textContent = 'An error occurred while sending the reminder.';
+                    responseDiv.style.color = 'red';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
